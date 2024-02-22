@@ -25,3 +25,24 @@ def save(role: RoleDTO, response: Response, db: Session = Depends(get_db)):
     response_controller = controller.save(role, db)
     response.status_code = int(response_controller.metadata.statusCode)
     return response_controller
+
+
+@router.get("/", responses={
+    HTTPStatus.OK: {"model": CommonResponseDTO[list[Role]]},
+    HTTPStatus.BAD_REQUEST: {"model": CommonResponseDTO[str]}
+})
+def find_all(response: Response, db: Session = Depends(get_db)):
+    response_controller = controller.find_all(db)
+    response.status_code = int(response_controller.metadata.statusCode)
+    return response_controller
+
+
+@router.delete("/{id}", responses={
+    HTTPStatus.OK: {"model": CommonResponseDTO},
+    HTTPStatus.NOT_FOUND: {"model": CommonResponseDTO[str]},
+    HTTPStatus.BAD_REQUEST: {"model": CommonResponseDTO[str]}
+})
+def delete(id_role: int, response: Response, db: Session = Depends(get_db)):
+    response_controller = controller.delete(id_role, db)
+    response.status_code = int(response_controller.metadata.statusCode)
+    return response_controller
