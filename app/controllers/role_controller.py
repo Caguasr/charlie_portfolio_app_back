@@ -10,3 +10,9 @@ class RoleController:
 
     def save(self, role: RoleDTO, db: Session):
         return self.service.save(role, db)
+
+    def find_all(self, db: Session):
+        return self.service.find_all(db)
+
+    def delete(self, id_role: int, db: Session):
+        return self.service.delete(id_role, db)

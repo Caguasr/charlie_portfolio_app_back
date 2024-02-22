@@ -18,3 +18,14 @@ class User(Base):
 
     role = relationship("Role", back_populates="user")
     information = relationship("UserInformation", back_populates="user")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'password': self.password,
+            'active': self.active,
+            'created_at': self.created_at if self.created_at else None,
+            'role_id': self.role_id,
+            'role': self.role.__dict__ if self.role else None,
+        }
