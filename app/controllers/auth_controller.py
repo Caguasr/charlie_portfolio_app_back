@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 
 from app.commons.responses.common_response_DTO import CommonResponseDTO
 from app.models.auth import AuthDTO
-from app.services.JWTService import JWTService
 from app.services.auth_service import AuthService
 
 

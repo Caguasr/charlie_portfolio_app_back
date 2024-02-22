@@ -9,7 +9,6 @@ from app.commons.pasword_enconder.crypt import Crypt
 from app.commons.responses.common_response_DTO import CommonResponseDTO
 from app.dependecies import get_db
 from app.models.auth import AuthDTO, AuthToken
-from app.services.JWTService import JWTService
 from app.services.services_impl.auth_service_impl import AuthServiceImpl
 from app.utils.jwt_util import JWTUtil
 

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.commons.responses.common_response_DTO import CommonResponseDTO
 from app.controllers.role_controller import RoleController
-from app.dependecies import get_db, oauth2_scheme
+from app.dependecies import get_db
 from app.models.role import Role, RoleDTO
 from app.models.unauthorized import Unauthorized
 from app.services.services_impl.role_service_impl import RoleServiceImpl

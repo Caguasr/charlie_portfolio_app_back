@@ -13,7 +13,6 @@ from app.configs.database import DatabaseConfig
 from app.configs.environment import environment
 from app.models.user import User
 from app.services.services_impl.user_service_impl import UserServiceImpl
-from app.services.user_service import UserService
 
 db = DatabaseConfig(environment.db_host, environment.db_port, environment.db_username, environment.db_password,
                     environment.db_name)
@@ -43,20 +42,21 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db_session: Sess
         headers={"WWW-Authenticate": "Bearer"}
     )
     try:
-        print(token)
         payload = jwt.decode(token, secret_key, Constants.ALGORITHM_TOKEN)
         id_user: str = payload.get("sub")
         if id_user is None:
             raise credentials_exception
     except JWTError as e:
         raise credentials_exception
-    return user_service.get_user_by_id(int(id_user), db_session)
+    get_user = user_service.get_user_by_id(int(id_user), db_session)
+    return User(**dict(get_user.data))
 
 
-async def get_current_user_active(response: CommonResponseDTO[User] = Depends(get_current_user)):
-    if response.metadata.statusCode != str(HTTPStatus.OK) or not response.data["active"]:
+async def get_current_user_active(response: User = Depends(get_current_user)):
+    if not response or not response.active:
         raise HTTPException(
-            status_code=int(response.metadata.statusCode),
-            detail=response.model_dump()
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail=CommonResponseDTO.build_response(str(HTTPStatus.UNAUTHORIZED), Constants.MSG_INVALID_CREDENTIALS,
+                                                    None)
         )
     return response
