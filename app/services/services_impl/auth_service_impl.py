@@ -10,7 +10,6 @@ from app.commons.responses.common_response_DTO import CommonResponseDTO
 from app.configs.environment import environment
 from app.entities.user import User as UserEntity
 from app.models.auth import AuthDTO
-from app.models.user import User
 from app.services.JWTService import JWTService
 from app.services.auth_service import AuthService
 

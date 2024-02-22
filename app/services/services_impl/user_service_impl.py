@@ -1,13 +1,11 @@
 from http import HTTPStatus
 
-from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from app.commons.constants.constants import Constants
 from app.commons.pasword_enconder.password_encoder import PasswordEncoder
 from app.commons.responses.common_response_DTO import CommonResponseDTO
 from app.entities.user import User as UserEntity
-from app.models.role import Role
 from app.models.user import User, UserDTO
 from app.services.user_service import UserService
 

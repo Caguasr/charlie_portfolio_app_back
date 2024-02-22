@@ -4,11 +4,13 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 
+from app.commons.constants.constants import Constants
 from app.commons.pasword_enconder.crypt import Crypt
 from app.commons.pasword_enconder.password_encoder import PasswordEncoder
 from app.commons.responses.common_response_DTO import CommonResponseDTO
 from app.controllers.user_controller import UserController
 from app.dependecies import get_db, get_current_user_active
+from app.models.unauthorized import Unauthorized
 from app.models.user import User, UserDTO
 from app.services.services_impl.user_service_impl import UserServiceImpl
 from app.services.user_service import UserService
@@ -18,7 +20,9 @@ PREFIX = '/users'
 
 router = APIRouter(
     tags=TAGS,
-    prefix=PREFIX
+    prefix=PREFIX,
+    responses={HTTPStatus.UNAUTHORIZED: {"model": Unauthorized}},
+    dependencies=[Depends(get_current_user_active)]
 )
 crypt: PasswordEncoder = Crypt()
 userService: UserService = UserServiceImpl(crypt)
@@ -57,7 +61,7 @@ async def delete(id_user: int, response: Response, db: Session = Depends(get_db)
 
 
 @router.get("/profile", responses={
-    HTTPStatus.OK: {"model": CommonResponseDTO[User]}
+    HTTPStatus.OK: {"model": CommonResponseDTO[User]},
 })
-async def profile(current_user: Annotated[CommonResponseDTO, Depends(get_current_user_active)]):
-    return current_user
+async def profile(current_user: Annotated[User, Depends(get_current_user_active)]):
+    return CommonResponseDTO.build_response(str(HTTPStatus.OK), Constants.MSG_OK, current_user.model_dump())

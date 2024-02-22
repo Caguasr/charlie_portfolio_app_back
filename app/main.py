@@ -1,10 +1,7 @@
-from fastapi import FastAPI, Depends
-
-from . import entities
-from .configs.database import DatabaseConfig
-from .dependecies import get_db, oauth2_scheme
-from .routers import users_information, role, user, auth
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from .routers import users_information, role, user, auth
 
 app = FastAPI(
     title="Portfolio API",
@@ -18,7 +15,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-app.include_router(auth.router, dependencies=[Depends(get_db)])
-app.include_router(role.router, dependencies=[Depends(get_db), Depends(oauth2_scheme)])
-app.include_router(user.router, dependencies=[Depends(get_db), Depends(oauth2_scheme)])
-app.include_router(users_information.router, dependencies=[Depends(get_db), Depends(oauth2_scheme)])
+app.include_router(auth.router)
+app.include_router(role.router)
+app.include_router(user.router)
+app.include_router(users_information.router)

@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 
-from passlib.context import CryptContext
-
 
 class PasswordEncoder(ABC):
     @abstractmethod
