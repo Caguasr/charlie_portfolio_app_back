@@ -1,11 +1,14 @@
+from http import HTTPStatus
 from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
+from app.commons.constants.constants import Constants
+
 
 class Metadata(BaseModel):
-    statusCode: str = Field(description="Status code response", example="200")
-    message: str = Field(description="Message response", example="200 OK")
+    statusCode: str = Field(description="Status code response", examples=[HTTPStatus.OK, HTTPStatus.NOT_FOUND])
+    message: str = Field(description="Message response", examples=[Constants.MSG_OK, Constants.MSG_NOT_FOUND])
 
 
 T = TypeVar("T")

@@ -7,5 +7,6 @@ class Constants:
     USER_IS_DISABLED = "User is disabled"
 
     MSG_INVALID_CREDENTIALS = "Username or Password is incorrect"
+    MSG_BAD_AUTHENTICATION = "Could not validate credentials"
 
     ALGORITHM_TOKEN = "HS256"

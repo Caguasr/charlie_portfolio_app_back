@@ -10,3 +10,6 @@ class RoleDTO(BaseModel):
 class Role(RoleDTO):
     id: int = Field(description="id role")
     created_at: datetime = Field(description="created at")
+
+    class Config:
+        from_attributes: True

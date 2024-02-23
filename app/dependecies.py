@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from app.commons.constants.constants import Constants
+from app.commons.exceptions.common_exception import CommonException
 from app.commons.pasword_enconder.crypt import Crypt
 from app.commons.responses.common_response_DTO import CommonResponseDTO
 from app.configs.database import DatabaseConfig
@@ -36,10 +37,10 @@ user_service = UserServiceImpl(crypt)
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme), db_session: Session = Depends(get_db)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"}
+    credentials_exception = CommonException(
+        code=HTTPStatus.UNAUTHORIZED,
+        message=CommonResponseDTO.build_response(str(HTTPStatus.UNAUTHORIZED), Constants.MSG_BAD_AUTHENTICATION,
+                                                 None).model_dump()
     )
     try:
         payload = jwt.decode(token, secret_key, Constants.ALGORITHM_TOKEN)
@@ -54,9 +55,9 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db_session: Sess
 
 async def get_current_user_active(response: User = Depends(get_current_user)):
     if not response or not response.active:
-        raise HTTPException(
-            status_code=HTTPStatus.UNAUTHORIZED,
-            detail=CommonResponseDTO.build_response(str(HTTPStatus.UNAUTHORIZED), Constants.MSG_INVALID_CREDENTIALS,
-                                                    None)
+        raise CommonException(
+            code=HTTPStatus.UNAUTHORIZED,
+            message=CommonResponseDTO.build_response(str(HTTPStatus.UNAUTHORIZED), Constants.MSG_BAD_AUTHENTICATION,
+                                                     None).model_dump()
         )
     return response
