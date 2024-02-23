@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.commons.responses.common_response_DTO import CommonResponseDTO
 from app.controllers.role_controller import RoleController
-from app.dependecies import get_db
+from app.dependecies import get_db, get_current_user_active
 from app.models.role import Role, RoleDTO
 from app.models.unauthorized import Unauthorized
 from app.services.services_impl.role_service_impl import RoleServiceImpl
@@ -13,7 +13,12 @@ from app.services.services_impl.role_service_impl import RoleServiceImpl
 ENDPOINT_NAME = "/roles"
 TAGS = ["Role"]
 
-router = APIRouter(prefix=ENDPOINT_NAME, tags=TAGS, responses={HTTPStatus.UNAUTHORIZED: {"model": Unauthorized}})
+router = APIRouter(
+    prefix=ENDPOINT_NAME,
+    tags=TAGS,
+    responses={HTTPStatus.UNAUTHORIZED: {"model": Unauthorized}},
+    dependencies=[Depends(get_current_user_active)]
+)
 controller = RoleController(RoleServiceImpl())
 
 
