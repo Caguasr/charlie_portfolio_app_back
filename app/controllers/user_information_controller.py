@@ -3,6 +3,7 @@ from http import HTTPStatus
 from sqlalchemy.orm import Session
 
 from app.commons.constants.constants import Constants
+from app.commons.exceptions.common_exception import CommonException
 from app.commons.responses.common_response_DTO import CommonResponseDTO
 from app.models.user import User
 from app.models.user_information import UserInformationDTO
@@ -15,10 +16,7 @@ class UserInformationController:
         self.service = user_information_service
 
     def get_user_information(self, user: User, db: Session) -> CommonResponseDTO:
-        try:
-            return self.service.get_user_information(user, db)
-        except Exception as e:
-            return CommonResponseDTO.build_response(str(HTTPStatus.BAD_REQUEST), Constants.MSG_ERROR, str(e))
+        return self.service.get_user_information(user, db)
 
     def save_user_information(self, user_information: UserInformationDTO, current_user: User,
                               db: Session) -> CommonResponseDTO:

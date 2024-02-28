@@ -1,6 +1,7 @@
 from http import HTTPStatus
+from typing import Annotated
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Header
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
@@ -12,7 +13,9 @@ from app.commons.pasword_enconder.crypt import Crypt
 from app.commons.responses.common_response_DTO import CommonResponseDTO
 from app.configs.database import DatabaseConfig
 from app.configs.environment import environment
+from app.models.token_key import TokenKey
 from app.models.user import User
+from app.services.services_impl.token_key_service_impl import TokenKeyServiceImpl
 from app.services.services_impl.user_service_impl import UserServiceImpl
 
 db = DatabaseConfig(environment.db_host, environment.db_port, environment.db_username, environment.db_password,
@@ -30,10 +33,11 @@ def get_db():
         db_session.close()
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=environment.api_context_path + "/auth/login")
 
 crypt = Crypt()
 user_service = UserServiceImpl(crypt)
+token_key_service = TokenKeyServiceImpl()
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme), db_session: Session = Depends(get_db)):
@@ -57,7 +61,34 @@ async def get_current_user_active(response: User = Depends(get_current_user)):
     if not response or not response.active:
         raise CommonException(
             code=HTTPStatus.UNAUTHORIZED,
-            message=CommonResponseDTO.build_response(str(HTTPStatus.UNAUTHORIZED), Constants.MSG_BAD_AUTHENTICATION,
+            message=CommonResponseDTO.build_response(str(HTTPStatus.UNAUTHORIZED),
+                                                     Constants.MSG_BAD_AUTHENTICATION,
                                                      None).model_dump()
         )
     return response
+
+
+async def get_current_user_by_api_key(api_key: Annotated[str, Header(alias="API-KEY")],
+                                      db_session: Session = Depends(get_db)):
+    try:
+        get_token_key: CommonResponseDTO = token_key_service.get_token_key_by_value(api_key, db_session)
+        get_user: CommonResponseDTO[User] = user_service.get_user_by_id(get_token_key.data["user_id"], db_session)
+        return User(**dict(get_user.data))
+    except Exception as e:
+        raise CommonException(
+            code=HTTPStatus.UNAUTHORIZED,
+            message=CommonResponseDTO.build_response(str(HTTPStatus.UNAUTHORIZED),
+                                                     Constants.MSG_BAD_AUTHENTICATION,
+                                                     None).model_dump()
+        )
+
+
+async def validate_api_key_token(user: User = Depends(get_current_user_by_api_key)):
+    if user is None or not user.active:
+        raise CommonException(
+            code=HTTPStatus.UNAUTHORIZED,
+            message=CommonResponseDTO.build_response(str(HTTPStatus.UNAUTHORIZED),
+                                                     Constants.MSG_BAD_AUTHENTICATION,
+                                                     None).model_dump()
+        )
+    return user

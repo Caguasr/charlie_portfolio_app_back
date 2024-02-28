@@ -5,6 +5,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.commons.constants.constants import Constants
+from app.commons.exceptions.common_exception import CommonException
 from app.commons.responses.common_response_DTO import CommonResponseDTO
 from app.entities.token_key import TokenKey as TokenKeyEntity
 from app.models.token_key import TokenKey
@@ -39,6 +40,16 @@ class TokenKeyServiceImpl(TokenKeyService):
             return CommonResponseDTO.build_response(str(HTTPStatus.OK), Constants.MSG_OK, to_json.token)
         except Exception as e:
             return CommonResponseDTO.build_response(str(HTTPStatus.BAD_REQUEST), Constants.MSG_ERROR, str(e))
+
+    def get_token_key_by_value(self, value: str, db: Session):
+        try:
+            token = db.query(TokenKeyEntity).filter(TokenKeyEntity.token == value).first()
+            if token is None:
+                return (CommonResponseDTO
+                        .build_response(str(HTTPStatus.NOT_FOUND), Constants.MSG_ERROR, Constants.MSG_NOT_FOUND))
+            return CommonResponseDTO.build_response(str(HTTPStatus.OK), Constants.MSG_OK, token.__dict__)
+        except Exception as e:
+            CommonResponseDTO.build_response(str(HTTPStatus.BAD_REQUEST), Constants.MSG_ERROR, str(e))
 
     @staticmethod
     def _delete_token_key_by_user(user: User, db: Session):
