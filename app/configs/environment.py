@@ -12,6 +12,7 @@ class Environment(BaseSettings):
     secret_key: str = os.environ.get("SECRET_KEY")
     time_expires_token: int = os.environ.get("TIME_EXPIRES_TOKEN")
     jwt_hash: str = "HS256"
+    api_context_path: str = "/api/v1"
 
     model_config = SettingsConfigDict(env_file=".env")
 
