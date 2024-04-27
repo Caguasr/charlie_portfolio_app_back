@@ -2,9 +2,11 @@ from pydantic import BaseModel, Field
 
 
 class UserInformationDTO(BaseModel):
+    name: str = Field(description="Name of the user", example="username lastname")
     about: str = Field(description="About your profile", example="i am a full stack developer")
     photo: str
     position: str = Field(description="work position", example="Full Stack Developer")
+    slogan: str | None = Field(description="slogan", example="I can do it!")
 
 
 class UserInformation(UserInformationDTO):
