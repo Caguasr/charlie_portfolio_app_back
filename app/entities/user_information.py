@@ -9,10 +9,12 @@ from app.configs.database import Base
 class UserInformation(Base):
     __tablename__ = "users_information"
     id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
     about = Column(String, nullable=False)
     photo = Column(String, nullable=False)
     position = Column(String, nullable=False)
     active = Column(Boolean, nullable=False, default=True)
+    slogan = Column(String, nullable=True)
     created_at = Column(DateTime, nullable=False, default=datetime.now())
 
     user_id = Column(Integer, ForeignKey("users.id"))

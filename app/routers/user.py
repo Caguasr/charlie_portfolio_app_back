@@ -22,7 +22,7 @@ router = APIRouter(
     tags=TAGS,
     prefix=PREFIX,
     responses={HTTPStatus.UNAUTHORIZED: {"model": Unauthorized}},
-    dependencies=[Depends(get_current_user_active)]
+    # dependencies=[Depends(get_current_user_active)]
 )
 crypt: PasswordEncoder = Crypt()
 userService: UserService = UserServiceImpl(crypt)
